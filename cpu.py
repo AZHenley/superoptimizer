@@ -26,5 +26,5 @@ class CPU:
         return state
     
     def inc(self, state, mem):
-        state[mem] += state[mem] + 1
+        state[mem] += 1
         return state
