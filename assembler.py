@@ -1,6 +1,7 @@
 import re
 from cpu import CPU
 
+# Turns a string into a program.
 def parse(assembly):
     lines = assembly.split('\n')
     program = []
@@ -14,6 +15,7 @@ def parse(assembly):
             program.append((op, *args))
     return program
 
+# Turns a program into a string.
 def output(program):
     if len(program) == 0: return "\n"
     cpu = CPU(1)
