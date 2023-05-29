@@ -20,7 +20,8 @@ class Superoptimizer:
                     program = [(op, *args) for op, args in zip(prog, arg_set)] 
                     yield program
 
-    def search(self, max_length, max_mem, max_val, target_state):
+    def search(self, max_length, max_mem, max_val, target_state, debug=False):
+        count = 0
         cpu = CPU(max_mem)
         for program in self.generate_programs(cpu, max_length, max_mem, max_val):
             state = cpu.execute(program)
@@ -28,7 +29,13 @@ class Superoptimizer:
                 state = tuple(state) 
                 if state not in self.program_cache or len(program) < len(self.program_cache[state]):
                     self.program_cache[state] = program
+            
+            # Debugging.
+            if debug:
+                count += 1
+                if count % 1000000 == 0: print(f"Programs searched: {count:,}")
+                if count % 10000000 == 0: 
+                    solution = self.program_cache.get(tuple(target_state), None)
+                    print(f"Best solution: {solution}")
+
         return self.program_cache.get(tuple(target_state), None)
-
-
-
