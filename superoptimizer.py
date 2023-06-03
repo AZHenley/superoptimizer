@@ -19,9 +19,6 @@ def optimal_from_state(state, max_length, max_val, debug=False):
 
 
 class Superoptimizer:
-    def __init__(self):
-        self.program_cache = {}
-
     # Generates all possible programs.
     def generate_programs(self, cpu, max_length, max_mem, max_val):
         yield []
@@ -46,16 +43,12 @@ class Superoptimizer:
         for program in self.generate_programs(cpu, max_length, max_mem, max_val):
             state = cpu.execute(program)
             if state == target_state:
-                state = tuple(state) 
-                if state not in self.program_cache or len(program) < len(self.program_cache[state]):
-                    self.program_cache[state] = program
-            
+                return program
+
             # Debugging.
             if debug:
                 count += 1
-                if count % 1000000 == 0: print(f"Programs searched: {count:,}")
-                if count % 10000000 == 0: 
-                    solution = self.program_cache.get(tuple(target_state), None)
-                    print(f"Best solution: {solution}")
+                if count % 1000000 == 0:
+                    print(f"Programs searched: {count:,}")
 
-        return self.program_cache.get(tuple(target_state), None)
+        return None
