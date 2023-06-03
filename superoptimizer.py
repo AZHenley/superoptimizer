@@ -24,18 +24,19 @@ class Superoptimizer:
 
     # Generates all possible programs.
     def generate_programs(self, cpu, max_length, max_mem, max_val):
+        yield []
         for length in range(1, max_length + 1):
             for prog in product(cpu.ops.values(), repeat=length):
                 arg_sets = []
                 for op in prog:
                     if op == cpu.load:
                         arg_sets.append([tuple([val]) for val in range(max_val + 1)])
-                    elif op == cpu.swap or op == cpu.xor: 
+                    elif op == cpu.swap or op == cpu.xor:
                         arg_sets.append(product(range(max_mem), repeat=2))
                     elif op == cpu.inc:
                         arg_sets.append([tuple([val]) for val in range(max_mem)])
                 for arg_set in product(*arg_sets):
-                    program = [(op, *args) for op, args in zip(prog, arg_set)] 
+                    program = [(op, *args) for op, args in zip(prog, arg_set)]
                     yield program
 
     # Tests all of the generated programs and returns the shortest.

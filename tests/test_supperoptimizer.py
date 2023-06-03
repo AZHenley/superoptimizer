@@ -36,7 +36,6 @@ def test_0_2_1():
 
 def test_zeros():
     # Optimal program is empty
-    # Test currently fails because the empty program isn't included in the search space
     assert_optimal_length(0, [0], 1, 3)
     assert_optimal_length(0, [0, 0], 1, 3)
 
