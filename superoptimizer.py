@@ -2,22 +2,21 @@ from itertools import product
 from cpu import CPU
 import assembler
 
-# Helper function that finds the optimal code given the assembly code.
-def optimal_from_code(assembly, max_length, max_mem, max_val, debug=False):
+
+# Helper function that runs a piece of assembly code.
+def run(assembly, max_mem):
     cpu = CPU(max_mem)
     program = assembler.parse(assembly)
-    state = cpu.execute(program)
-    print(f"***Source***{assembly}")
-    optimal_from_state(state, max_length, max_val, debug)
+    return cpu.execute(program)
+
 
 # Helper function that finds the optimal code given the goal state.
 def optimal_from_state(state, max_length, max_val, debug=False):
     max_mem = len(state)
-    print(f"***State***\n{state}\n") 
     opt = Superoptimizer()
-    shortest_program = opt.search(max_length, max_mem, max_val, state, debug) 
-    disassembly = assembler.output(shortest_program)
-    print(f"***Optimal***\n{disassembly}\n{'='*20}\n")
+    shortest_program = opt.search(max_length, max_mem, max_val, state, debug)
+    return assembler.output(shortest_program)
+
 
 class Superoptimizer:
     def __init__(self):
