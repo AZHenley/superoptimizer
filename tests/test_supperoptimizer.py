@@ -25,6 +25,8 @@ def assert_optimal_length(optimal_length, state, max_val):
     assert count_instructions(optimal) == optimal_length
     assert run(optimal, len(state)) == state
     assert optimal_from_state(state, optimal_length, max_val) == optimal
+    if optimal_length > 0:
+        assert optimal_from_state(state, optimal_length - 1, max_val) == None
 
 
 def test_four_threes():

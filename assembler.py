@@ -15,9 +15,13 @@ def parse(assembly):
             program.append((op, *args))
     return program
 
+
 # Turns a program into a string.
 def output(program):
-    if len(program) == 0: return "\n"
+    if program == None:
+        return None
+    if len(program) == 0:
+        return "\n"
     cpu = CPU(1)
     assembly = ""
     for instruction in program:
