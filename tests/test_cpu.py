@@ -34,3 +34,13 @@ INC 1
 INC 1
     """
     assert run(assembly, 2) == [42, 3]
+
+
+def test_input():
+    assembly = """
+XOR 1, 0
+INC 1
+    """
+    assert run(assembly, 2) == [0, 1]
+    assert run(assembly, 2, [2]) == [2, 3]
+    assert run(assembly, 2, [1, 2]) == [1, 4]

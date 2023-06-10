@@ -1,24 +1,32 @@
 from itertools import product
 from cpu import CPU
 import assembler
+import brute_force_equivialence_checker
 
 
-# Helper function that runs a piece of assembly code.
-def run(assembly, max_mem):
+def run(assembly, max_mem, input=()):
+    """
+    Helper function that runs a piece of assembly code.
+    """
     cpu = CPU(max_mem)
     program = assembler.parse(assembly)
-    return cpu.execute(program)
+    return cpu.execute(program, input)
 
 
-# Helper function that finds the optimal code given the goal state.
-def optimal_from_state(state, max_length, max_val, debug=False):
-    max_mem = len(state)
-    opt = Superoptimizer()
-    shortest_program = opt.search(max_length, max_mem, max_val, state, debug)
-    return assembler.output(shortest_program)
+def optimize(assembly, max_length, max_mem, max_val, input_size=0, debug=False):
+    """
+    Helper function that finds the optimal code given the assembly code.
+    """
+    program = assembler.parse(assembly)
+    opt = Superoptimizer(brute_force_equivialence_checker.are_equivalent)
+    shortest = opt.search(max_length, max_mem, max_val, program, input_size, debug)
+    return assembler.output(shortest)
 
 
 class Superoptimizer:
+    def __init__(self, are_equivalent):
+        self.are_equivalent = are_equivalent
+
     # Generates all possible programs.
     def generate_programs(self, cpu, max_length, max_mem, max_val):
         yield []
@@ -37,13 +45,12 @@ class Superoptimizer:
                     yield program
 
     # Tests all of the generated programs and returns the shortest.
-    def search(self, max_length, max_mem, max_val, target_state, debug=False):
+    def search(self, max_length, max_mem, max_val, program, input_size=0, debug=False):
         count = 0
         cpu = CPU(max_mem)
-        for program in self.generate_programs(cpu, max_length, max_mem, max_val):
-            state = cpu.execute(program)
-            if state == target_state:
-                return program
+        for optimal in self.generate_programs(cpu, max_length, max_mem, max_val):
+            if self.are_equivalent(optimal, program, max_mem, max_val, input_size):
+                return optimal
 
             # Debugging.
             if debug:

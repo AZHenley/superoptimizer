@@ -4,8 +4,9 @@ class CPU:
         self.state = [0] * max_mem_cells
         self.ops = {'LOAD': self.load, 'SWAP': self.swap, 'XOR': self.xor, 'INC': self.inc}
 
-    def execute(self, program):
+    def execute(self, program, input=()):
         state = self.state.copy()
+        state[0 : len(input)] = input
         for instruction in program:
             op = instruction[0]
             args = list(instruction[1:])
