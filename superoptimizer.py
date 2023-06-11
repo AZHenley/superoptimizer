@@ -1,55 +1,49 @@
 from itertools import product
-from cpu import CPU
 import assembler
 import brute_force_equivialence_checker
+from instruction_set import *
 
 
-def run(assembly, max_mem, input=()):
-    """
-    Helper function that runs a piece of assembly code.
-    """
-    cpu = CPU(max_mem)
-    program = assembler.parse(assembly)
-    return cpu.execute(program, input)
-
-
-def optimize(assembly, max_length, max_mem, max_val, input_size=0, debug=False):
+def optimize(assembly, max_length, max_val, input_size=0, debug=False):
     """
     Helper function that finds the optimal code given the assembly code.
     """
     program = assembler.parse(assembly)
     opt = Superoptimizer(brute_force_equivialence_checker.are_equivalent)
-    shortest = opt.search(max_length, max_mem, max_val, program, input_size, debug)
-    return assembler.output(shortest)
+    return opt.search(max_length, max_val, program, input_size, debug)
 
 
 class Superoptimizer:
     def __init__(self, are_equivalent):
         self.are_equivalent = are_equivalent
 
-    # Generates all possible programs.
-    def generate_programs(self, cpu, max_length, max_mem, max_val):
-        yield []
-        for length in range(1, max_length + 1):
-            for prog in product(cpu.ops.values(), repeat=length):
-                arg_sets = []
-                for op in prog:
-                    if op == cpu.load:
-                        arg_sets.append([tuple([val]) for val in range(max_val + 1)])
-                    elif op == cpu.swap or op == cpu.xor:
-                        arg_sets.append(product(range(max_mem), repeat=2))
-                    elif op == cpu.inc:
-                        arg_sets.append([tuple([val]) for val in range(max_mem)])
-                for arg_set in product(*arg_sets):
-                    program = [(op, *args) for op, args in zip(prog, arg_set)]
-                    yield program
+    @staticmethod
+    def generate_operands(operand_type, max_mem, max_val):
+        if operand_type == "const":
+            return range(max_val+1)
+        elif operand_type == "mem":
+            return range(max_mem)
+        else:
+            raise ValueError(f"Illegal operand type: {operand_type}")
 
-    # Tests all of the generated programs and returns the shortest.
-    def search(self, max_length, max_mem, max_val, program, input_size=0, debug=False):
+    # Generates all possible programs.
+
+    @staticmethod
+    def generate_programs(max_length, max_mem, max_val):
+        yield Program((), 0)
+        for length in range(1, max_length + 1):
+            instructions = []
+            for op, operand_types in OPS.items():
+                arg_sets = (Superoptimizer.generate_operands(ot, max_mem, max_val) for ot in operand_types)
+                instructions.extend(assembler.Instruction(op, args) for args in product(*arg_sets))
+            for prog in product(instructions, repeat=length):
+                yield Program(prog, max_mem)
+
+    # Tests all the generated programs and returns the shortest.
+    def search(self, max_length, max_val, program, input_size=0, debug=False):
         count = 0
-        cpu = CPU(max_mem)
-        for optimal in self.generate_programs(cpu, max_length, max_mem, max_val):
-            if self.are_equivalent(optimal, program, max_mem, max_val, input_size):
+        for optimal in self.generate_programs(max_length, program.mem_size, max_val):
+            if self.are_equivalent(optimal, program, max_val, input_size):
                 return optimal
 
             # Debugging.

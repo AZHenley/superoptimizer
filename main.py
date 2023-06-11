@@ -1,4 +1,5 @@
-from superoptimizer import *
+from superoptimizer import optimize
+from cpu import run
 
 
 def print_optimal_from_code(assembly, max_length, max_mem, max_val, debug=False):
@@ -16,22 +17,22 @@ def print_optimal_from_code(assembly, max_length, max_mem, max_val, debug=False)
 def main():
     # Test 1
     assembly = """
-LOAD 3
-SWAP 0, 1
-LOAD 3
-SWAP 0, 2
-LOAD 3
-SWAP 0, 3
-LOAD 3
+        LOAD 3
+        SWAP 0, 1
+        LOAD 3
+        SWAP 0, 2
+        LOAD 3
+        SWAP 0, 3
+        LOAD 3
     """
     print_optimal_from_code(assembly, 4, 4, 5)
 
     # Test 2
     assembly = """
-LOAD 2
-SWAP 0, 1
-LOAD 1
-SWAP 0, 2
+        LOAD 2
+        SWAP 0, 1
+        LOAD 1
+        SWAP 0, 2
     """
     print_optimal_from_code(assembly, 3, 3, 5)
 
