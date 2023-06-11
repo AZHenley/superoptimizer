@@ -21,7 +21,7 @@ def test_four_threes():
         XOR 2, 0
         XOR 3, 0
     """)
-    assert optimize(assembly, MAX_LENGTH, 3, 0) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
 
 
 def test_three_threes():
@@ -37,16 +37,14 @@ def test_three_threes():
         XOR 1, 0
         XOR 2, 0
     """)
-    assert optimize(assembly, MAX_LENGTH, 3, 0) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
     # Assert that the program is still found with a tight max_length
-    assert optimize(assembly, 3, 3, 0) == optimal
+    assert optimize(assembly, 3, 2, 0) == optimal
     # Assert that the program is not found with a max_length that's below the optimal length
-    assert optimize(assembly, 2, 3, 0) is None
-    # Assert that the program is not found when max_val is too low
-    assert optimize(assembly, 3, 2, 0) is None
+    assert optimize(assembly, 2, 2, 0) is None
 
     # Changing the input size to 1 doesn't change anything as the first input will be overridden by the load
-    assert optimize(assembly, MAX_LENGTH, 3, 1) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 1) == optimal
 
     # For input size 2, we'll need to clear the second input using swap and another load
     optimal = parse("""
@@ -55,7 +53,7 @@ def test_three_threes():
         LOAD 3
         XOR 2, 0
     """)
-    assert optimize(assembly, MAX_LENGTH, 3, 2) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 2) == optimal
 
 
 def test_0_2_1():
@@ -79,9 +77,9 @@ def test_no_op():
     """
     empty_program = Program((), 0)
     # Program results in the memory being unchanged, so optimal program is empty
-    assert optimize(assembly, MAX_LENGTH, 3, 0) == empty_program
-    assert optimize(assembly, MAX_LENGTH, 2, 1) == empty_program
-    assert optimize(assembly, MAX_LENGTH, 2, 2) == empty_program
+    assert optimize(assembly, MAX_LENGTH, 2, 0) == empty_program
+    assert optimize(assembly, MAX_LENGTH, 1, 1) == empty_program
+    assert optimize(assembly, MAX_LENGTH, 1, 2) == empty_program
 
 
 def test_increasing_sequence():
@@ -95,7 +93,7 @@ def test_increasing_sequence():
         XOR 1, 0
         INC 1
     """)
-    assert optimize(assembly, MAX_LENGTH, 3, 0) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
 
     assembly = """
         INC 0
@@ -112,7 +110,7 @@ def test_increasing_sequence():
         INC 1
         XOR 2, 1
     """)
-    assert optimize(assembly, MAX_LENGTH, 3, 0) == optimal
+    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
 
 
 def test_increasing_from_input():

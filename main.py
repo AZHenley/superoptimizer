@@ -2,14 +2,14 @@ from superoptimizer import optimize
 from cpu import run
 
 
-def print_optimal_from_code(assembly, max_length, max_mem, max_val, debug=False):
+def print_optimal_from_code(assembly, max_length, bit_width, debug=False):
     print(f"***Source***{assembly}")
-    state = run(assembly, max_mem)
+    state = run(assembly, bit_width)
     print("***State***")
     print(state)
     print()
     print("***Optimal***")
-    print(optimize(assembly, max_length, max_mem, max_val, debug))
+    print(optimize(assembly, max_length, bit_width, debug))
     print("=" * 20)
     print()
 
@@ -25,7 +25,7 @@ def main():
         SWAP 0, 3
         LOAD 3
     """
-    print_optimal_from_code(assembly, 4, 4, 5)
+    print_optimal_from_code(assembly, 4, 2)
 
     # Test 2
     assembly = """
@@ -34,7 +34,7 @@ def main():
         LOAD 1
         SWAP 0, 2
     """
-    print_optimal_from_code(assembly, 3, 3, 5)
+    print_optimal_from_code(assembly, 3, 2)
 
 
 main()
