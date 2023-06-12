@@ -4,12 +4,14 @@ import brute_force_equivialence_checker
 from instruction_set import *
 
 
-def optimize(assembly, max_length, bit_width, input_size=0, debug=False):
+def optimize(assembly, max_length, bit_width, input_size=0, *,
+             equivalence_checker=brute_force_equivialence_checker.are_equivalent,
+             debug=False):
     """
     Helper function that finds the optimal code given the assembly code.
     """
     program = assembler.parse(assembly)
-    opt = Superoptimizer(brute_force_equivialence_checker.are_equivalent)
+    opt = Superoptimizer(equivalence_checker)
     return opt.search(max_length, bit_width, program, input_size, debug)
 
 

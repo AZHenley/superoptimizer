@@ -9,7 +9,7 @@ def print_optimal_from_code(assembly, max_length, bit_width, debug=False):
     print(state)
     print()
     print("***Optimal***")
-    print(optimize(assembly, max_length, bit_width, debug))
+    print(optimize(assembly, max_length, bit_width, debug=debug))
     print("=" * 20)
     print()
 

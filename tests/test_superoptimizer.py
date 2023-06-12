@@ -1,8 +1,16 @@
 from superoptimizer import optimize
 from assembler import parse, Program
+import smt_based_equivalence_checker
 
 
 MAX_LENGTH = 1000000
+
+
+def optimize_with_both(*args):
+    result1 = optimize(*args)
+    result2 = optimize(*args, equivalence_checker=smt_based_equivalence_checker.are_equivalent)
+    assert result1 == result2
+    return result1
 
 
 def test_four_threes():
@@ -68,7 +76,7 @@ def test_0_2_1():
         SWAP 0, 1
         INC 2
     """)
-    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 0) == optimal
 
 
 def test_no_op():
@@ -77,9 +85,9 @@ def test_no_op():
     """
     empty_program = Program((), 0)
     # Program results in the memory being unchanged, so optimal program is empty
-    assert optimize(assembly, MAX_LENGTH, 2, 0) == empty_program
-    assert optimize(assembly, MAX_LENGTH, 1, 1) == empty_program
-    assert optimize(assembly, MAX_LENGTH, 1, 2) == empty_program
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 0) == empty_program
+    assert optimize_with_both(assembly, MAX_LENGTH, 1, 1) == empty_program
+    assert optimize_with_both(assembly, MAX_LENGTH, 1, 2) == empty_program
 
 
 def test_increasing_sequence():
@@ -93,7 +101,7 @@ def test_increasing_sequence():
         XOR 1, 0
         INC 1
     """)
-    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 0) == optimal
 
     assembly = """
         INC 0
@@ -133,3 +141,13 @@ def test_increasing_from_input():
         INC 2
     """)
     assert optimize(assembly, MAX_LENGTH, 2, 1) == optimal
+
+
+def test_add_to_three_mem_cells():
+    assembly = """
+        INC 0
+        INC 1
+        INC 2
+    """
+    optimal = parse(assembly)
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 2) == optimal
