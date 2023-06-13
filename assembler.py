@@ -1,34 +1,34 @@
 import re
-from cpu import CPU
+from instruction_set import *
 
-# Turns a string into a program.
+
+INSTRUCTION_REGEX = re.compile(r'(\w+)\s+([-\d]+(?:\s*,\s*[-\d]+)*)')
+
+
 def parse(assembly):
+    """
+    Turns a string into a program
+    """
     lines = assembly.split('\n')
-    program = []
-    cpu = CPU(1)
+    instructions = []
+    mem_size = 1
     for line in lines:
-        match = re.match(r'(\w+)\s+([-\d]+)(?:,\s*([-\d]+)(?:,\s*([-\d]+))?)?', line)
+        line = line.strip()
+        if line == '':
+            continue
+        match = INSTRUCTION_REGEX.fullmatch(line)
         if match:
-            op_str, *args_str = match.groups()
-            op = cpu.ops[op_str]
-            args = [int(arg) for arg in args_str if arg is not None]
-            program.append((op, *args))
-    return program
-
-# Turns a program into a string.
-def output(program):
-    if len(program) == 0: return "\n"
-    cpu = CPU(1)
-    assembly = ""
-    for instruction in program:
-        op = instruction[0]
-        args = instruction[1:]
-        if op.__name__ == cpu.load.__name__:
-            assembly += f"LOAD {args[0]}\n"
-        elif op.__name__ == cpu.swap.__name__:
-            assembly += f"SWAP {args[0]}, {args[1]}\n"
-        elif op.__name__ == cpu.xor.__name__:
-            assembly += f"XOR {args[0]}, {args[1]}\n"
-        elif op.__name__ == cpu.inc.__name__:
-            assembly += f"INC {args[0]}\n"
-    return assembly
+            op, args_str = match.groups()
+            args = tuple(int(arg) for arg in args_str.split(","))
+            operand_types = OPS[op]
+            if len(args) != len(operand_types):
+                raise ValueError(f'Wrong number of operands: {line}')
+            for arg, arg_type in zip(args, operand_types):
+                if arg_type == 'mem':
+                    if arg < 0:
+                        raise ValueError(f'Negative memory address: {line}')
+                    mem_size = max(arg + 1, mem_size)
+            instructions.append(Instruction(op, args))
+        else:
+            raise ValueError(f'Invalid syntax: {line}')
+    return Program(tuple(instructions), mem_size)

@@ -19,8 +19,6 @@ To focus on the superoptimizer and not making a comprehensive, realistic assembl
 
 There are many possible improvements:
 
-- **Start state.** Right now it assumes the start state is always the same, which means there is no concept of program input.
-- **Program equivalence.** A set of inputs and outputs should be specified such that two programs can actually be tested for equivalence.
 - **Pruning.** Many nonsensical programs are generated, which significantly slows it down.
 - **More instructions.** There need to be more instructions, especially a conditional instruction, to give the superoptimizer more opportunities to make improvements.
 
