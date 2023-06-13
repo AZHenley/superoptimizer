@@ -1,6 +1,6 @@
 from superoptimizer import optimize
 from assembler import parse, Program
-import smt_based_equivalence_checker
+from smt_based_equivalence_checker import SmtBasedEquivalenceChecker
 
 
 MAX_LENGTH = 1000000
@@ -8,7 +8,7 @@ MAX_LENGTH = 1000000
 
 def optimize_with_both(*args):
     result1 = optimize(*args)
-    result2 = optimize(*args, equivalence_checker=smt_based_equivalence_checker.are_equivalent)
+    result2 = optimize(*args, equivalence_checker=SmtBasedEquivalenceChecker)
     assert result1 == result2
     return result1
 
@@ -29,6 +29,8 @@ def test_four_threes():
         XOR 2, 0
         XOR 3, 0
     """)
+    # This test case takes too long with the SMT-based equivalence checker, so we only test with the brute force one
+    # (which doesn't actually need much force when the input size is 0)
     assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
 
 
@@ -45,14 +47,14 @@ def test_three_threes():
         XOR 1, 0
         XOR 2, 0
     """)
-    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 0) == optimal
     # Assert that the program is still found with a tight max_length
-    assert optimize(assembly, 3, 2, 0) == optimal
+    assert optimize_with_both(assembly, 3, 2, 0) == optimal
     # Assert that the program is not found with a max_length that's below the optimal length
-    assert optimize(assembly, 2, 2, 0) is None
+    assert optimize_with_both(assembly, 2, 2, 0) is None
 
     # Changing the input size to 1 doesn't change anything as the first input will be overridden by the load
-    assert optimize(assembly, MAX_LENGTH, 2, 1) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 1) == optimal
 
     # For input size 2, we'll need to clear the second input using swap and another load
     optimal = parse("""
@@ -61,7 +63,7 @@ def test_three_threes():
         LOAD 3
         XOR 2, 0
     """)
-    assert optimize(assembly, MAX_LENGTH, 2, 2) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 2) == optimal
 
 
 def test_0_2_1():
@@ -118,7 +120,7 @@ def test_increasing_sequence():
         INC 1
         XOR 2, 1
     """)
-    assert optimize(assembly, MAX_LENGTH, 2, 0) == optimal
+    assert optimize_with_both(assembly, MAX_LENGTH, 2, 0) == optimal
 
 
 def test_increasing_from_input():

@@ -1,5 +1,9 @@
 import assembler
-import smt_based_equivalence_checker
+from smt_based_equivalence_checker import SmtBasedEquivalenceChecker
+
+
+def are_equivalent(program1, program2, bit_width, input_size):
+    return SmtBasedEquivalenceChecker(program1, bit_width, input_size).is_equivalent_to(program2)
 
 
 def test_add_three():
@@ -11,15 +15,15 @@ def test_add_three():
     load_three = assembler.parse('LOAD 3')
     one_inc = assembler.parse('INC 0')
 
-    assert smt_based_equivalence_checker.are_equivalent(three_incs, load_three, 8, 0)
-    assert not smt_based_equivalence_checker.are_equivalent(three_incs, one_inc, 8, 0)
+    assert are_equivalent(three_incs, load_three, 8, 0)
+    assert not are_equivalent(three_incs, one_inc, 8, 0)
     # With a single bit, += 1 and += 3 are equivalent
-    assert smt_based_equivalence_checker.are_equivalent(three_incs, one_inc, 1, 0)
+    assert are_equivalent(three_incs, one_inc, 1, 0)
 
     # If there's user input, setting to three and increasing by three are no longer equivalent
-    assert not smt_based_equivalence_checker.are_equivalent(three_incs, load_three, 8, 1)
+    assert not are_equivalent(three_incs, load_three, 8, 1)
     # However, += 1 and += 3 are still equivalent for single bits
-    assert smt_based_equivalence_checker.are_equivalent(three_incs, one_inc, 1, 1)
+    assert are_equivalent(three_incs, one_inc, 1, 1)
 
 
 def test_swap_vs_xor():
@@ -31,9 +35,9 @@ def test_swap_vs_xor():
     swap_with_swap = assembler.parse('SWAP 0, 1')
     just_xor = assembler.parse('XOR 0, 1')
 
-    assert smt_based_equivalence_checker.are_equivalent(swap_with_xor, swap_with_swap, 8, 2)
-    assert not smt_based_equivalence_checker.are_equivalent(swap_with_xor, just_xor, 8, 2)
-    assert not smt_based_equivalence_checker.are_equivalent(swap_with_swap, just_xor, 8, 2)
+    assert are_equivalent(swap_with_xor, swap_with_swap, 8, 2)
+    assert not are_equivalent(swap_with_xor, just_xor, 8, 2)
+    assert not are_equivalent(swap_with_swap, just_xor, 8, 2)
 
 
 def test_large_program_with_lots_of_inputs():
@@ -59,4 +63,4 @@ def test_large_program_with_lots_of_inputs():
         INC 4
         INC 5
     """)
-    assert smt_based_equivalence_checker.are_equivalent(program1, program2, 8, 6)
+    assert are_equivalent(program1, program2, 8, 6)
